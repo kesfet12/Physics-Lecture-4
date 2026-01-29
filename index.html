@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>محاضرات الرنين - التركيب الذري والتمغنط</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #202124;
+            --accent-color: #0056b3;
+            --nav-bg: #f8f9fa;
+            --highlight: #e8f0fe;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Roboto', 'Cairo', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 90px;
+            min-height: 100vh;
+            overscroll-behavior-y: none;
+        }
+
+        .content-container {
+            padding: 30px 25px;
+            max-width: 800px;
+            margin: 0 auto;
+            direction: ltr;
+        }
+
+        p {
+            line-height: 2.2;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            text-align: justify;
+            color: #333;
+        }
+
+        .title-text {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: #000;
+            margin-bottom: 25px;
+            display: block;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        .sub-title {
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: var(--accent-color);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .lecture-image-container {
+            width: 100%;
+            margin: 25px 0;
+            text-align: center;
+        }
+
+        .lecture-image {
+            max-width: 100%;
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            border: 1px solid #eee;
+        }
+
+        .clickable {
+            cursor: pointer;
+            border-radius: 6px;
+            padding: 2px 2px;
+            transition: background 0.2s;
+        }
+
+        .clickable:active {
+            background-color: var(--highlight);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background-color: var(--nav-bg);
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+            z-index: 1000;
+            direction: rtl; 
+        }
+
+        .nav-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-family: 'Cairo', sans-serif;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn:disabled {
+            background-color: #e0e0e0;
+            color: #999;
+            box-shadow: none;
+        }
+
+        .page-counter {
+            font-family: 'Cairo', sans-serif;
+            font-weight: bold;
+            color: #555;
+            background: #e9ecef;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 1rem;
+        }
+
+        .sheet-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: flex-end;
+            backdrop-filter: blur(3px);
+        }
+
+        .sheet-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sheet-content {
+            background: white;
+            width: 100%;
+            max-height: 85vh;
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+            padding: 25px;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            overflow-y: auto;
+            direction: rtl;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+        }
+
+        .sheet-overlay.active .sheet-content {
+            transform: translateY(0);
+        }
+
+        .sheet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .sheet-title {
+            font-family: 'Cairo', sans-serif;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--accent-color);
+        }
+
+        .close-btn {
+            background: #f0f0f0;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 20px;
+            color: #555;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .interactive-word {
+            display: inline-block;
+            cursor: pointer;
+            padding: 2px 3px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            margin: 0 1px;
+            border-bottom: 1px dotted #ccc;
+        }
+
+        .interactive-word:hover {
+            background-color: #f0f4f8;
+            border-bottom-color: var(--accent-color);
+        }
+
+        .interactive-word:active, .interactive-word.active {
+            background-color: var(--accent-color);
+            color: white;
+            border-bottom-color: transparent;
+        }
+
+        .text-box {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .label {
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: bold;
+        }
+
+        .english-text {
+            font-family: 'Roboto', sans-serif;
+            direction: ltr;
+            font-size: 1.2rem;
+            color: #212529;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        .arabic-text {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.15rem;
+            color: #198754; 
+            line-height: 1.7;
+        }
+
+        .selected-word-box {
+            background-color: #e3f2fd;
+            border: 1px solid #bbdefb;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            display: none;
+            margin-top: 10px;
+            animation: slideUp 0.3s ease;
+        }
+
+        .selected-word-box.show {
+            display: block;
+        }
+
+        .sw-english {
+            font-family: 'Roboto', sans-serif;
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: var(--accent-color);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .sw-arabic {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.4rem;
+            color: #333;
+            font-weight: bold;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="content-container" id="contentArea"></div>
+
+    <div class="bottom-nav">
+        <button class="nav-btn" id="nextBtn" onclick="changePage(1)">
+            التالي
+            <span>&#8592;</span>
+        </button>
+        
+        <div class="page-counter" id="pageIndicator">1 / 4</div>
+        
+        <button class="nav-btn" id="prevBtn" onclick="changePage(-1)">
+            <span>&#8594;</span>
+            السابق
+        </button>
+    </div>
+
+    <div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet(event)">
+        <div class="sheet-content">
+            <div class="sheet-header">
+                <span class="sheet-title">الترجمة والتحليل</span>
+                <button class="close-btn" onclick="toggleSheet(false)">&times;</button>
+            </div>
+            <div id="sheetBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const dictionary = {
+            "the": "الـ", "of": "من/لـ", "in": "في", "and": "و", "is": "هو/يكون", 
+            "are": "هم/يكونون", "to": "إلى/لـ", "a": "أداة تنكير", "an": "أداة تنكير", 
+            "with": "مع", "without": "بدون", "or": "أو", "by": "بواسطة", "that": "الذي/ذلك",
+            "which": "الذي/التي", "this": "هذا", "these": "هؤلاء/هذه", "it": "هو/هي",
+            "can": "يمكن", "be": "يكون", "from": "من", "for": "لأجل", "on": "على", 
+            "so": "لذلك", "such": "مثل", "as": "كـ/مثل", "at": "عند/في", "but": "لكن", 
+            "very": "جداً", "more": "أكثر", "less": "أقل", "most": "معظم/الأكثر",
+            "what": "ماذا/ما", "you": "أنت", "do": "تفعل", "because": "لأن", "some": "بعض",
+            "when": "عندما", "where": "أين/حيث", "all": "الكل", "any": "أي", "not": "لا/ليس",
+            "often": "غالباً", "although": "رغم أن", "hence": "وبالتالي", "even": "حتى",
+            "about": "تقريباً/حول", "its": "الخاص به", "their": "الخاص بهم", "has": "لديه/يملك",
+            "have": "لدينا/يملكون", "atomic": "ذري", "structure": "تركيب", "atoms": "ذرات", 
+            "atom": "ذرة", "made": "مصنوع", "things": "أشياء", "including": "بما في ذلك", 
+            "human": "بشري", "body": "جسم", "small": "صغير", "half": "نصف", 
+            "million": "مليون", "lined": "مصفوفة", "up": "أعلى", "together": "معاً", 
+            "narrower": "أضيق", "than": "من", "hair": "شعر", "organized": "منظم", 
+            "molecules": "جزيئات", "two": "اثنين", "arranged": "مرتب", "abundant": "وفير", 
+            "hydrogen": "هيدروجين", "commonly": "شائع", "found": "موجود", "water": "ماء", 
+            "oxygen": "أوكسجين", "fat": "دهون", "carbon": "كربون", "number": "رقم/عدد", 
+            "each": "كل", "depends": "يعتمد", "type": "نوع", "consists": "يتكون", 
+            "central": "مركزي", "nucleus": "نواة", "orbiting": "يدور في مدار", "electrons": "إلكترونات", 
+            "billionth": "جزء من مليار", "total": "كلي", "volume": "حجم", "contains": "يحتوي", 
+            "entire": "كامل", "mass": "كتلة", "mainly": "بشكل رئيسي", "particles": "جسيمات", 
+            "called": "يسمى", "nucleons": "النيوكليونات", "subdivided": "مقسم", 
+            "protons": "بروتونات", "neutrons": "نيوترونات", "characterized": "يتميز", 
+            "ways": "طرق", "sum": "مجموع", "gives": "يعطي", "chemical": "كيميائي", 
+            "identity": "هوية", "usually": "عادة", "balanced": "متوازن", 
+            "slightly": "قليلاً", "fewer": "أقل", "elements": "عناصر", "same": "نفس", 
+            "different": "مختلف", "isotopes": "نظائر", "nuclei": "أنوية", "odd": "فردي", 
+            "important": "مهم", "mri": "الرنين المغناطيسي", "see": "انظر", "later": "لاحقاً", 
+            "spin": "يدور/يبرم", "around": "حول", "traditionally": "تقليدياً", "thought": "يعتقد", 
+            "analogous": "مشابه", "planets": "كواكب", "sun": "شمس", "reality": "واقع", 
+            "exist": "يوجد", "cloud": "سحابة", "outermost": "خارجي", "dimension": "بعد", 
+            "edge": "حافة", "position": "موقع", "predictable": "قابل للتنبؤ", "energy": "طاقة", 
+            "individual": "فردي", "moment": "لحظة", "time": "وقت", "physicists": "فيزيائيين", 
+            "call": "يسمي", "uncertainty": "عدم اليقين", "principle": "مبدأ", 
+            "positive": "موجب", "electrical": "كهربائي", "charge": "شحنة", "net": "صافي", 
+            "negatively": "بشكل سالب", "charged": "مشحون", "stable": "مستقر", "equals": "يساوي", 
+            "positively": "بشكل موجب", "altered": "تغير", "applying": "تطبيق", "external": "خارجي", 
+            "knock": "ضرب/اخراج", "out": "خارج", "causes": "يسبب", "deficit": "نقص", 
+            "compared": "مقارنة", "instability": "عدم استقرار", "occurred": "حدث", 
+            "ions": "أيونات", "magnetization": "تمغنط", "earth": "أرض", "spinning": "دوار", 
+            "ball": "كرة", "floating": "طافي", "space": "فضاء", "quite": "تماماً", 
+            "happily": "بسعادة", "nothing": "لا شيء", "worry": "قلق", "lessons": "دروس", 
+            "school": "مدرسة", "remember": "يتذكر", "rotating": "دوار", "creates": "يخلق", 
+            "magnetic": "مغناطيسي", "field": "مجال", "sure": "تأكيد", "enough": "كفاية", 
+            "find": "يجد", "way": "طريق", "place": "مكان", "another": "آخر", 
+            "means": "وسيلة", "compass": "بوصلة", "strength": "قوة", "rather": "نوعاً ما", 
+            "poles": "أقطاب", "equator": "خط الاستواء", "tesla": "تسلا", "unit": "وحدة", 
+            "short": "قصير/باختصار", "establish": "يؤسس", "giant": "عملاق", "bar": "قضيب", 
+            "magnet": "مغناطيس", "north": "شمال", "south": "جنوب", "figure": "شكل", 
+            "common": "مشترك", "bit": "قليل", "put": "يضع", "under": "تحت", 
+            "microscope": "مجهر", "look": "يبدو", "familiar": "مألوف", "tiny": "صغير جداً", 
+            "little": "صغير", "balls": "كرات", "own": "خاصته", "axes": "محاور", 
+            "generating": "توليد", "generate": "يولد", "image": "صورة", "moving": "متحرك", 
+            "charges": "شحنات", "rise": "نشوء", "consequently": "بناء على ذلك", 
+            "expect": "يتوقع", "possess": "يمتلك", "indeed": "بالفعل", "true": "حقيقي", 
+            "well": "جيداً", "known": "معروف", "chemistry": "كيمياء", "precise": "دقيق", 
+            "consider": "اعتبر", "simplest": "أبسط", "periodic": "دوري", "table": "جدول", 
+            "contain": "يحتوي", "orbital": "مداري", "acts": "يتصرف", "like": "مثل", 
+            "dipole": "ثنائي القطب", "name": "اسم", "magnetism": "مغناطيسية", 
+            "essential": "ضروري", "source": "مصدر", "associated": "مرتبط", "form": "يشكل", 
+            "signal": "إشارة", "conclude": "نستنتج", "above": "أعلاه", "reasons": "أسباب", 
+            "taking": "أخذ", "first": "أولاً", "off": "من", "actually": "في الواقع", 
+            "secondly": "ثانياً", "quantum": "كم", "physics": "فيزياء", "thing": "شيء", 
+            "gyro": "جيرو", "ratio": "نسبة", "beyond": "خارج", "scope": "نطاق", 
+            "book": "كتاب", "represents": "يمثل", "suffice": "يكفي", "know": "يعرف", 
+            "happens": "يحدث", "largest": "الأكبر"
+        };
+
+        const pages = [
+            // السلايد الأول: 1.6 Atomic Structure (بدون صورة)
+            {
+                content: [
+                    {
+                        text: "1.6 Atomic Structure",
+                        trans: "1.6 التركيب الذري",
+                        isTitle: true
+                    },
+                    {
+                        text: "All things are made of atoms, including the human body. Atoms are very small. Half a million lined up together are narrower than a human hair. Atoms are organized in molecules, which are two or more atoms arranged together.",
+                        trans: "كل الأشياء مصنوعة من ذرات، بما فيها جسم الإنسان. الذرات كلش صغيرة. نص مليون ذرة مصفوفة سوية أضيق من شعرة إنسان. الذرات منظمة بجزيئات، وهي عبارة عن ذرتين أو أكثر مرتبة سوية."
+                    },
+                    {
+                        text: "The most abundant atom in the body is hydrogen. This is most commonly found in molecules of water (where two hydrogen atoms are arranged with one oxygen atom, H2O) and fat (where hydrogen atoms are arranged with carbon and oxygen atoms; the number of each depends on the type of fat).",
+                        trans: "أكثر ذرة متوفرة بالجسم هي الهيدروجين. وهاي موجودة بشكل شائع بجزيئات المي (حيث تترتب ذرتين هيدروجين ويا ذرة أوكسجين وحدة) وبالدهون (حيث تترتب ذرات الهيدروجين ويا ذرات كربون وأوكسجين؛ وعدد كل وحدة يعتمد على نوع الدهن)."
+                    },
+                    {
+                        text: "The atom consists of a central nucleus and orbiting electrons. The nucleus is very small, one millionth of a billionth of the total volume of an atom, but it contains the entire atom’s mass. This mass comes mainly from particles called nucleons, which are subdivided into protons and neutrons.",
+                        trans: "تتكون الذرة من نواة مركزية وإلكترونات تدور بمدار. النواة كلش صغيرة، واحد من مليون من المليار من الحجم الكلي للذرة، بس تحتوي على كتلة الذرة بالكامل. هاي الكتلة تجي بشكل رئيسي من جسيمات تسمى النيوكليونات، واللي تتقسم إلى بروتونات ونيوترونات."
+                    },
+                    {
+                        text: "Atoms are characterized in two ways. The atomic number is the sum of the protons in the nucleus. This number gives an atom its chemical identity. The mass number is the sum of the protons and neutrons in the nucleus.",
+                        trans: "تتميز الذرات بطريقتين. العدد الذري هو مجموع البروتونات بالنواة. هذا الرقم ينطي الذرة هويتها الكيميائية. العدد الكتلي هو مجموع البروتونات والنيوترونات بالنواة."
+                    },
+                    {
+                        text: "The number of neutrons and protons in a nucleus are usually balanced so that the mass number is an even number. In some atoms, however, there are slightly more or fewer neutrons than protons.",
+                        trans: "عدد النيوترونات والبروتونات بالنواة عادة يكون متوازن بحيث العدد الكتلي يكون رقم زوجي. بس ببعض الذرات، اكو نيوترونات أكثر شوية أو أقل من البروتونات."
+                    },
+                    {
+                        text: "Atoms of elements with the same number of protons but a different number of neutrons are called isotopes. Nuclei with an odd mass number (a different number of protons to neutrons) are important in MRI (see later).",
+                        trans: "ذرات العناصر اللي عدها نفس عدد البروتونات بس عدد مختلف من النيوترونات تسمى نظائر. الأنوية اللي عدها عدد كتلي فردي (عدد مختلف من البروتونات والنيوترونات) تكون مهمة بالرنين المغناطيسي (انظر لاحقاً)."
+                    },
+                    {
+                        text: "Electrons are particles that spin around the nucleus. Traditionally this is thought of as being analogous to planets orbiting around the sun. In reality, electrons exist around the nucleus in a cloud; the outermost dimension of the cloud is the edge of the atom.",
+                        trans: "الإلكترونات هي جسيمات تفتر حول النواة. تقليدياً هذا يعتقد انه مشابه للكواكب الي تفتر حول الشمس. بالواقع، الإلكترونات موجودة حول النواة بسحابة؛ البعد الخارجي مال السحابة هو حافة الذرة."
+                    },
+                    {
+                        text: "The position of an electron in the cloud is not predictable as it depends on the energy of an individual electron at any moment in time (physicists call this Heisenberg’s Uncertainty Principle). The number of electrons, however, is usually the same as the number of protons in the nucleus.",
+                        trans: "موقع الإلكترون بالسحابة غير قابل للتنبؤ لأنه يعتمد على طاقة الإلكترون الفردي بأي لحظة من الزمن (الفيزيائيين يسمون هذا مبدأ عدم اليقين لهايزنبرغ). عدد الإلكترونات، مع ذلك، عادة يكون نفس عدد البروتونات بالنواة."
+                    }
+                ]
+            },
+            // السلايد الثاني: Ions & Magnetization
+            {
+                content: [
+                    {
+                        text: "Protons have a positive electrical charge; neutrons have no net charge and electrons are negatively charged. So, atoms are electrically stable if the number of negatively charged electrons equals the number of positively charged protons.",
+                        trans: "البروتونات عدها شحنة كهربائية موجبة؛ النيوترونات ما عدها شحنة صافية والإلكترونات مشحونة بشكل سالب. لذلك، الذرات تكون مستقرة كهربائياً إذا عدد الإلكترونات المشحونة سالب يساوي عدد البروتونات المشحونة موجب."
+                    },
+                    {
+                        text: "This balance is sometimes altered by applying external energy to knock out electrons from the atom. This causes a deficit in the number of electrons compared with protons and causes electrical instability. Atoms, in which this has occurred, are called ions.",
+                        trans: "هذا التوازن يتغير أحياناً بتطبيق طاقة خارجية لإخراج إلكترونات من الذرة. هذا يسبب نقص بعدد الإلكترونات مقارنة بالبروتونات ويسبب عدم استقرار كهربائي. الذرات، اللي حدث بيها هذا، تسمى أيونات."
+                    },
+                    {
+                        text: "1.7 Magnetization",
+                        trans: "1.7 التمغنط",
+                        isTitle: true
+                    },
+                    {
+                        text: "The earth electrically charged and spinning ball is floating in space. Quite happily: nothing to worry about.",
+                        trans: "الكرة الأرضية المشحونة كهربائياً والدوارة تطفو بالفضاء. بسعادة تامة: لا شيء يدعو للقلق."
+                    },
+                    {
+                        text: "From our physics lessons in school we may remember that a rotating electrical charge creates a magnetic field. And sure enough, the earth has a magnetic field, which we use to find our way from one place to another by means of a compass.",
+                        trans: "من دروس الفيزياء بالمدرسة يمكن نتذكر أن الشحنة الكهربائية الدوارة تخلق مجال مغناطيسي. وفعلاً، الأرض تمتلك مجال مغناطيسي، نستخدمه حتى نجد طريقنا من مكان لآخر بواسطة البوصلة."
+                    },
+                    {
+                        text: "The magnetic field strength of the earth is rather small: 30 T at the poles and 70T at the equator. (Tesla is unit for magnetic fields). In short we can establish that the earth is a giant spinning bar magnet, with a north and a south pole (Figure 9).",
+                        trans: "قوة المجال المغناطيسي للأرض صغيرة نوعاً ما: 30 تسلا بالأقطاب و 70 تسلا بخط الاستواء. (تسلا هي وحدة للمجالات المغناطيسية). باختصار نكدر نؤسس أن الأرض هي قضيب مغناطيسي عملاق دوار، بقطب شمالي وقطب جنوبي (شكل 9)."
+                    },
+                    {
+                        type: 'image',
+                        src: 'figure9_earth_magnet.jpg'
+                    }
+                ]
+            },
+            // السلايد الثالث: Body vs Earth
+            {
+                content: [
+                    {
+                        text: "We have many in common with earth. If we take a bit from our body and we would put it under an electron microscope we can see things that look rather familiar.",
+                        trans: "عدنا الكثير مشترك مع الأرض. إذا أخذنا قطعة صغيرة من جسمنا وخليناها تحت مجهر إلكتروني نكدر نشوف أشياء تبدو مألوفة نوعاً ما."
+                    },
+                    {
+                        text: "We see tiny little balls, which rotate around their own axes and also have an electrical charge and they have particles floating around it. This balls which we see are atoms.",
+                        trans: "نشوف كرات صغيرة جداً، تدور حول محاورها الخاصة وهمين عدها شحنة كهربائية وعدها جسيمات تطفو حولها. هاي الكرات اللي نشوفها هي ذرات."
+                    },
+                    {
+                        text: "And atoms have everything to do with MRI, because we use them to generate our MR image. Another thing we have in common with earth is water. Our body consists of 80% water.",
+                        trans: "والذرات الها علاقة بكلشي يخص الرنين، لأن نستخدمها حتى نولد صورة الرنين الخاصة بينا. شي ثاني عدنا مشترك مع الأرض هو المي. جسمنا يتكون من 80% مي."
+                    },
+                    {
+                        text: "The moving charges give rise to magnetic fields. Consequently, we might expect that something that is charged and spinning would also possess a magnetic field. This is indeed true.",
+                        trans: "الشحنات المتحركة تؤدي إلى نشوء مجالات مغناطيسية. وبالتالي، ممكن نتوقع أن شي مشحون ويدور راح يمتلك أيضاً مجال مغناطيسي. هذا بالفعل حقيقي."
+                    },
+                    {
+                        text: "Well known in the chemistry that there are many different elements, to be precise there are 110 elements. Human body consists mainly of water \"about 80% water\". Water consists of one oxygen and two hydrogen atoms.",
+                        trans: "معروف جيداً بالكيمياء أن اكو عناصر مختلفة كثيرة، للدقة اكو 110 عناصر. جسم الإنسان يتكون بشكل رئيسي من المي \"حوالي 80% مي\". المي يتكون من أوكسجين واحد وذرتين هيدروجين."
+                    },
+                    {
+                        text: "Consider the simplest nucleus, which is hydrogen atom (the first element in the periodic table) has a nucleus contain one proton, and one electron orbital. This proton is electrically positive charged and it rotates around (spin) its axis.",
+                        trans: "اعتبر أبسط نواة، اللي هي ذرة الهيدروجين (أول عنصر بالجدول الدوري) تمتلك نواة تحتوي بروتون واحد، ومدار إلكترون واحد. هذا البروتون مشحون كهربائياً موجب ويدور (يبرم) حول محوره."
+                    },
+                    {
+                        text: "Also, the hydrogen proton behaves as if it were a tiny bar magnet with a north and a south pole (Figure 10).",
+                        trans: "أيضاً، بروتون الهيدروجين يتصرف وكأنه قضيب مغناطيسي صغير جداً بقطب شمالي وقطب جنوبي (شكل 10)."
+                    },
+                    {
+                        type: 'image',
+                        src: 'figure10_hydrogen_magnet.jpg'
+                    }
+                ]
+            },
+            // السلايد الرابع: Why Hydrogen?
+            {
+                content: [
+                    {
+                        text: "Hydrogen protons in the body thus act like many tiny magnets. The nucleus is said to be a magnetic dipole, and the name for its magnetism is magnetic moment.",
+                        trans: "بروتونات الهيدروجين بالجسم تتصرف مثل مغناطيسات صغيرة كثيرة. النواة يقال عنها أنها ثنائي قطب مغناطيسي، والاسم لمغناطيسيتها هو العزم المغناطيسي."
+                    },
+                    {
+                        text: "It is essential that there be a source of protons (protons in the nuclei of hydrogen atoms, which are associated with fat molecules and water) in order to form the MR signal.",
+                        trans: "من الضروري أن يكون اكو مصدر للبروتونات (البروتونات بأنوية ذرات الهيدروجين، المرتبطة بجزيئات الدهون والمي) لأجل تكوين إشارة الرنين."
+                    },
+                    {
+                        text: "We conclude from the above that there are two reasons for taking hydrogen as a source to form the MR signal or MR imaging source.",
+                        trans: "نستنتج من أعلاه أن اكو سببين لأخذ الهيدروجين كمصدر لتكوين إشارة الرنين أو مصدر تصوير الرنين."
+                    },
+                    {
+                        text: " First off all we have a lot of them in our body. Actually, it's the most abundant element we have.",
+                        trans: " أولاً وقبل كلشي عدنا الكثير منها بجسمنا. بالواقع، هو أكثر عنصر وفير عدنا."
+                    },
+                    {
+                        text: " Secondly, in quantum physics there is a thing called “Gyro Magnetic Ratio”. It is beyond the scope of this book what it represents; suffice to know that this ratio is different for each proton.",
+                        trans: " ثانياً، بفيزياء الكم اكو شي يسمى \"النسبة الجيرومغناطيسية\". هو خارج نطاق هذا الكتاب ماذا يمثل؛ يكفي أن نعرف أن هاي النسبة مختلفة لكل بروتون."
+                    },
+                    {
+                        text: "It just so happens, that this gyro magnetic ratio for Hydrogen is the largest; 42.57 MHz/Tesla.",
+                        trans: "يحدث فقط، أن هاي النسبة الجيرومغناطيسية للهيدروجين هي الأكبر؛ 42.57 ميغاهرتز/تسلا."
+                    }
+                ]
+            }
+        ];
+
+        let currentIndex = 0;
+
+        function renderPage() {
+            const container = document.getElementById('contentArea');
+            const data = pages[currentIndex];
+            
+            document.getElementById('pageIndicator').innerText = `${currentIndex + 1} / ${pages.length}`;
+            document.getElementById('prevBtn').disabled = currentIndex === 0;
+            document.getElementById('nextBtn').disabled = currentIndex === pages.length - 1;
+
+            let html = '';
+            
+            data.content.forEach((item, idx) => {
+                if (item.type === 'image') {
+                    html += `
+                        <div class="lecture-image-container">
+                            <img src="${item.src}" alt="Lecture Figure" class="lecture-image">
+                        </div>
+                    `;
+                } else {
+                    let cssClass = "clickable";
+                    if (item.isTitle) cssClass += " title-text";
+                    if (item.isSubTitle) cssClass += " sub-title";
+
+                    html += `<p class="${cssClass}" onclick="analyzeSentence(${idx})">${item.text}</p>`;
+                }
+            });
+
+            container.innerHTML = html;
+            window.scrollTo(0,0);
+        }
+
+        function analyzeSentence(idx) {
+            const data = pages[currentIndex].content[idx];
+            
+            if(!data || !data.text) return; 
+            
+            const originalText = data.text;
+            const words = originalText.split(' ');
+            let interactiveText = '';
+
+            words.forEach(word => {
+                const cleanWordForLookup = word.replace(/[.,()?!:;“”"]/g, '').toLowerCase();
+                interactiveText += `<span class="interactive-word" onclick="showWordMeaning('${cleanWordForLookup}', this, '${word}')">${word}</span> `;
+            });
+
+            const sheetBody = document.getElementById('sheetBody');
+            sheetBody.innerHTML = `
+                <div class="text-box">
+                    <span class="label">اضغط على أي كلمة لمعرفة معناها:</span>
+                    <div class="english-text">${interactiveText}</div>
+                </div>
+
+                <div class="text-box">
+                    <span class="label">الترجمة العراقية:</span>
+                    <div class="arabic-text">${data.trans}</div>
+                </div>
+
+                <div id="selectedWordBox" class="selected-word-box">
+                    <span id="swEnglish" class="sw-english"></span>
+                    <span id="swArabic" class="sw-arabic"></span>
+                </div>
+            `;
+
+            toggleSheet(true);
+        }
+
+        function showWordMeaning(cleanWord, element, originalWord) {
+            document.querySelectorAll('.interactive-word').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            const translation = dictionary[cleanWord] || "---"; 
+            
+            const box = document.getElementById('selectedWordBox');
+            const enSpan = document.getElementById('swEnglish');
+            const arSpan = document.getElementById('swArabic');
+
+            enSpan.innerText = originalWord.replace(/[.,()?!:;“”"]/g, ''); 
+            arSpan.innerText = translation;
+
+            box.classList.remove('show');
+            void box.offsetWidth; 
+            box.classList.add('show');
+        }
+
+        function toggleSheet(show) {
+            const overlay = document.getElementById('sheetOverlay');
+            if (show) {
+                overlay.classList.add('active');
+            } else {
+                overlay.classList.remove('active');
+            }
+        }
+
+        function closeSheet(e) {
+            if (e.target.id === 'sheetOverlay') {
+                toggleSheet(false);
+            }
+        }
+
+        function changePage(dir) {
+            currentIndex += dir;
+            renderPage();
+        }
+
+        renderPage();
+
+    </script>
+</body>
+</html>
+
